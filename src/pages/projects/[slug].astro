@@ -78,10 +78,8 @@ if (!project) {
       </div>
     </main>
     <Footer />
-    <!-- expose people data (server-rendered) and modal markup + behaviour -->
-    <script>
-      window.__PEOPLE = {JSON.stringify(people)};
-    </script>
+    <!-- expose people data (server-rendered) via a data attribute to avoid template->JS injection issues -->
+    <div id="people-data" data-people={JSON.stringify(people)} style="display:none"></div>
     <div id="person-modal" class="modal" aria-hidden="true">
       <div class="modal-overlay" data-modal-close></div>
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -124,7 +122,15 @@ if (!project) {
       
       // person modal logic
       const initPersonModal = () => {
-        const people = window.__PEOPLE || [];
+        // read people data from hidden data attribute (safer than injecting raw JS)
+        let people = [];
+        try {
+          const el = document.getElementById('people-data');
+          const raw = el && el.dataset && el.dataset.people;
+          people = raw ? JSON.parse(raw) : [];
+        } catch (err) {
+          people = [];
+        }
         const modal = document.getElementById('person-modal');
         const modalContent = modal && modal.querySelector('.modal-content');
         const closeButtons = modal && modal.querySelectorAll('[data-modal-close]');

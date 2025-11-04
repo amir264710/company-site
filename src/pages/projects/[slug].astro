@@ -62,7 +62,7 @@ if (!project) {
                   const displayName = person ? person.name : (member.name || member.id || 'Unknown');
                   const dataId = member.id || member.name;
                   return (
-                    <div class="team-member team-clickable" data-id={dataId} role="button" tabindex="0">
+                    <div class="team-member team-clickable" data-id={dataId} data-photo={person && person.photo ? person.photo : ''} role="button" tabindex="0">
                       {person && person.photo ? (
                         <div class="team-avatar"><img src={person.photo} alt={displayName} /></div>
                       ) : (
@@ -152,12 +152,14 @@ if (!project) {
         // click handlers on team members
         const clickable = Array.from(document.querySelectorAll('.team-clickable'));
         clickable.forEach(el => {
-          el.addEventListener('click', () => {
+            el.addEventListener('click', () => {
             const id = el.dataset.id;
             const fallbackName = el.querySelector('strong')?.textContent || id;
             const p = (people.find(x => x.id === id) || people.find(x => x.name === id)) || { name: fallbackName, role: el.querySelector('.role')?.textContent || '', photo: '', notes: [] };
             const notesHtml = (p.notes || []).map(n => `<li>${n}</li>`).join('');
-            const photo = p.photo ? `<div class="person-photo"><img src="${p.photo}" alt="${p.name}"></div>` : '';
+            const dataPhoto = el.dataset.photo || '';
+            const photoSrc = p.photo || dataPhoto || '';
+            const photo = photoSrc ? `<div class="person-photo"><img src="${photoSrc}" alt="${p.name || fallbackName}"></div>` : '';
             const html = `
               <article class="person-card modal-card">
                 ${photo}

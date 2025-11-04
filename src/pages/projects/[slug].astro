@@ -1,0 +1,184 @@
+---
+import '../../styles/global.css';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { projects } from '../../data/projects.js';
+import { people } from '../../data/people.js';
+
+export async function getStaticPaths() {
+  return projects.map((p) => ({ params: { slug: p.slug } }));
+}
+
+const project = projects.find((p) => p.slug === Astro.params.slug);
+if (!project) {
+  throw new Error(`Project not found: ${Astro.params.slug}`);
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{project.title} — Acme Inc</title>
+  </head>
+  <body>
+    <Nav />
+    <!-- header with large centered title to match the provided layout -->
+    <header class="project-header">
+      <div class="container">
+        <h1 class="project-title"><span class="accent">{project.title}</span></h1>
+      </div>
+    </header>
+
+    <!-- full-width layout so media can sit flush to the viewport left (gallery can overflow) -->
+    <main class="project-page">
+      <aside class="project-media card">
+        <img class="project-hero" src={project.heroImage} alt={project.title} />
+        <div class="carousel" aria-hidden="false">
+          <div class="track">
+            {project.gallery && project.gallery.map((g, i) => (
+              <img src={g} alt={`${project.title} screenshot ${i+1}`} key={`a-${i}`} />
+            ))}
+            {project.gallery && project.gallery.map((g, i) => (
+              <img src={g} alt={`${project.title} screenshot ${i+1}`} key={`b-${i}`} />
+            ))}
+          </div>
+        </div>
+      </aside>
+
+      <div class="project-content-outer">
+        <div class="project-content card container">
+          <div class="project-description">
+            <p class="tagline">{project.description}</p>
+            <div class="project-body" set:html={project.content}></div>
+          </div>
+
+          <div class="project-team">
+            <h3>People involved</h3>
+            <div class="team-grid">
+                {project.team && project.team.map(member => {
+                  const person = member.id ? people.find(p => p.id === member.id) : people.find(p => p.name === member.name);
+                  const displayName = person ? person.name : (member.name || member.id || 'Unknown');
+                  const dataId = member.id || member.name;
+                  return (
+                    <div class="team-member team-clickable" data-id={dataId} role="button" tabindex="0">
+                      {person && person.photo ? (
+                        <div class="team-avatar"><img src={person.photo} alt={displayName} /></div>
+                      ) : (
+                        <div class="team-avatar">{String(displayName).split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+                      )}
+                      <div class="team-meta"><strong>{displayName}</strong><span class="role">{member.role}</span></div>
+                    </div>
+                  )
+                })}
+              </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <Footer />
+    <!-- expose people data (server-rendered) and modal markup + behaviour -->
+    <script>
+      window.__PEOPLE = {JSON.stringify(people)};
+    </script>
+    <div id="person-modal" class="modal" aria-hidden="true">
+      <div class="modal-overlay" data-modal-close></div>
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <button class="modal-close" aria-label="Close" data-modal-close>×</button>
+        <div class="modal-content"></div>
+      </div>
+    <script type="module">
+      // thumbnail -> hero switcher
+      const initHeroSwitcher = () => {
+        const hero = document.querySelector('.project-hero');
+        const thumbs = Array.from(document.querySelectorAll('.carousel .track img'));
+        if (!hero || !thumbs.length) return;
+
+        // helper to set active thumb
+        const setActive = (el) => {
+          thumbs.forEach(t => t.classList.remove('active'));
+          el && el.classList.add('active');
+        };
+
+        // set first active by default (use first unique image)
+        setActive(thumbs[0]);
+
+        thumbs.forEach(t => {
+          t.style.cursor = 'pointer';
+          t.addEventListener('click', (e) => {
+            // set hero src & alt
+            hero.src = t.src;
+            hero.alt = t.alt || hero.alt;
+            setActive(t);
+          });
+        });
+      };
+
+      // init on DOMContentLoaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeroSwitcher);
+      } else {
+        initHeroSwitcher();
+      }
+      
+      // person modal logic
+      const initPersonModal = () => {
+        const people = window.__PEOPLE || [];
+        const modal = document.getElementById('person-modal');
+        const modalContent = modal && modal.querySelector('.modal-content');
+        const closeButtons = modal && modal.querySelectorAll('[data-modal-close]');
+
+        if (!modal || !modalContent) return;
+
+        const openModal = (html) => {
+          modalContent.innerHTML = html;
+          modal.setAttribute('aria-hidden', 'false');
+          modal.classList.add('open');
+          // trap focus briefly - focus close button
+          const btn = modal.querySelector('.modal-close');
+          btn && btn.focus();
+        };
+
+        const closeModal = () => {
+          modal.setAttribute('aria-hidden', 'true');
+          modal.classList.remove('open');
+          modalContent.innerHTML = '';
+        };
+
+        closeButtons.forEach(b => b.addEventListener('click', closeModal));
+        modal.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+        // click handlers on team members
+        const clickable = Array.from(document.querySelectorAll('.team-clickable'));
+        clickable.forEach(el => {
+          el.addEventListener('click', () => {
+            const id = el.dataset.id;
+            const fallbackName = el.querySelector('strong')?.textContent || id;
+            const p = (people.find(x => x.id === id) || people.find(x => x.name === id)) || { name: fallbackName, role: el.querySelector('.role')?.textContent || '', photo: '', notes: [] };
+            const notesHtml = (p.notes || []).map(n => `<li>${n}</li>`).join('');
+            const photo = p.photo ? `<div class="person-photo"><img src="${p.photo}" alt="${p.name}"></div>` : '';
+            const html = `
+              <article class="person-card modal-card">
+                ${photo}
+                <div class="person-body">
+                  <h3 id="modal-title">${p.name}</h3>
+                  <div class="person-role">${p.role}</div>
+                  <ul class="person-notes">${notesHtml}</ul>
+                </div>
+              </article>
+            `;
+            openModal(html);
+          });
+          el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') el.click(); });
+        });
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initPersonModal);
+      } else {
+        initPersonModal();
+      }
+    </script>
+  </body>
+</html>

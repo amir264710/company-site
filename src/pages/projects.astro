@@ -1,0 +1,33 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { projects } from '../data/projects.js';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Projects — Acme Inc</title>
+  </head>
+  <body>
+    <Nav />
+    <main class="container">
+      <h1>Projects</h1>
+      <p class="tagline">Selected work and case studies.</p>
+      <div class="card">
+        <h3>Selected projects</h3>
+        <div class="projects-list">
+          {projects.map(project => (
+            <article class="project-item" key={project.slug}>
+              <h4><a href={`/projects/${project.slug}`}>{project.title}</a></h4>
+              <p>{project.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

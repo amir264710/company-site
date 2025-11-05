@@ -1,42 +1,29 @@
 ---
-import '../styles/global.css';
+import Base from '../layouts/Base.astro';
 import IntroVideos from '../components/IntroVideos.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Caraco — Company Intro</title>
-    <link rel="icon" href="/favicon.svg" />
-  </head>
-  <body>
-    <Nav />
-    <IntroVideos />
 
-    <main class="container">
-      <section id="about" class="card">
-        <h2>About Us</h2>
-  <p>Caraco is a small team of designers and engineers focused on building beautiful, accessible web experiences.</p>
-      </section>
+<Base title="Caraco — Company Intro">
+  <IntroVideos />
 
-      <section id="services" class="card">
-        <h2>Services</h2>
-        <ul>
-          <li>Product Design</li>
-          <li>Web Development</li>
-          <li>Consulting</li>
-        </ul>
-      </section>
+  <main class="container">
+    <section id="about" class="card">
+      <h2>About Us</h2>
+      <p>Caraco is a small team of designers and engineers focused on building beautiful, accessible web experiences.</p>
+    </section>
 
-      <section id="contact" class="card">
-        <h2>Contact</h2>
-  <p>Email: hello@caraco.example</p>
-      </section>
-    </main>
+    <section id="services" class="card">
+      <h2>Services</h2>
+      <ul>
+        <li>Product Design</li>
+        <li>Web Development</li>
+        <li>Consulting</li>
+      </ul>
+    </section>
 
-    <Footer />
-  </body>
-</html>
+    <section id="contact" class="card">
+      <h2>Contact</h2>
+      <p>Email: hello@caraco.example</p>
+    </section>
+  </main>
+</Base>

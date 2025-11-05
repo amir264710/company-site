@@ -23,9 +23,9 @@ export const people = [
   {
     id: 'mohammad-kakvand',
     name: 'Mohammad Hossein Kakvand',
-    role: 'دلقک',
+    role: 'Team Member',
     photo: '/pictures/people/dalghak.jpg',
-    notes: ['Make people laugh', 'Clean the place', 'other +18🍆 services']
+    notes: ['Community support', 'Office logistics']
   }
   ,
   {

@@ -12,6 +12,7 @@ body{
   background:var(--bg);
   color:#0f172a;
 }
+/* removed temporary flex layout to preserve hero fullscreen behavior */
 .container{max-width:900px;margin:0 auto;padding:2rem}
 .hero{background:linear-gradient(90deg, #eef2ff, #fff);padding:4rem 0;border-bottom:1px solid rgba(15,23,42,0.04)}
 .hero h1{margin:0;font-size:2.2rem}
@@ -23,7 +24,7 @@ body{
 .site-nav{position:fixed;top:0;left:0;right:0;z-index:1100;background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0));backdrop-filter:blur(4px);border-bottom:0}
 .site-nav a{color:inherit}
 .nav-inner{display:flex;align-items:center;justify-content:space-between}
-.nav-links{list-style:none;margin:0;padding:0;display:flex;gap:1rem}
+.nav-links{list-style:none;margin:0;padding:0;display:flex;gap:2.5rem}
 .nav-links a{text-decoration:none;color:var(--muted);padding:0.25rem 0}
 .nav-links a:hover{color:var(--accent)}
 .nav-toggle{display:none;background:none;border:0;font-size:1.2rem}
@@ -35,26 +36,57 @@ body{
   z-index:9998;
   backdrop-filter: blur(6px);
   box-shadow: 0 6px 24px rgba(2,6,23,0.45);
+  min-height:42px; /* slightly shorter navbar */
 }
 .site-nav a{color:inherit}
-.nav-inner{display:flex;align-items:center;justify-content:flex-end;gap:1.25rem;padding:0.75rem 2rem}
+.nav-inner{display:flex;align-items:center;justify-content:center;gap:1.25rem;padding:0.75rem 2rem}
 .brand{font-weight:800;text-decoration:none;color:#fff;font-style:normal;font-size:1.05rem}
 /* place brand flush to the left edge of the viewport */
-.site-nav > .brand{position:absolute;left:1rem;top:50%;transform:translateY(-50%);z-index:10001}
+.site-nav > .brand{position:static}
+
+/* brand logo sizing */
+.brand-logo{height:36px;display:block}
+.brand img{height:36px;display:block}
+
+/* give the brand the same spacing as nav items */
+.brand{margin-right:2.5rem}
 
 /* place the nav controls at the extreme right of the viewport */
-.site-nav .nav-links{position:absolute;right:1rem;top:50%;transform:translateY(-50%);z-index:10000}
 .site-nav .nav-toggle{position:absolute;right:1rem;top:50%;transform:translateY(-50%);z-index:10001}
 
 /* ensure the centered container doesn't add extra left padding now that brand is absolutely positioned */
-.nav-inner{padding-left:0}
-.nav-links{list-style:none;margin:0;padding:0;display:flex;gap:1rem}
-.nav-links a{text-decoration:none;color:rgba(255,255,255,0.95);padding:0.25rem 0;font-style:normal;font-weight:700;letter-spacing:0.02em;text-transform:uppercase}
+.nav-inner{padding-left:0;gap:2rem}
+.nav-links{list-style:none;margin:0;padding:0;display:flex;gap:2.5rem}
+.nav-links a{text-decoration:none;color:rgba(255,255,255,0.95);padding:0.2rem 0;font-style:normal;font-weight:600;font-size:0.95rem;letter-spacing:0.02em;text-transform:uppercase}
 .nav-links a:hover{color:var(--accent)}
 .nav-toggle{display:none;background:none;border:0;font-size:1.2rem;color:rgba(255,255,255,0.95)}
-.site-footer{padding:2rem 0;background:transparent;border-top:1px solid rgba(15,23,42,0.03);color:var(--muted)}
-.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.footer-links a{color:var(--muted);text-decoration:none;margin-left:1rem}
+.site-footer{
+  color: #dbeafe; /* light text */
+}
+
+/* top portion of the footer with columns */
+.site-footer-top{background: #1f2326;padding:3.25rem 0 2.5rem;border-top:1px solid rgba(255,255,255,0.02)}
+.footer-grid{display:grid;grid-template-columns: 1.6fr 1fr 1fr;gap:2.25rem;align-items:start}
+.footer-grid > .footer-col{padding-right:0.75rem}
+.footer-grid > .footer-col:not(:first-child){border-left:1px solid rgba(255,255,255,0.06);padding-left:1rem}
+.footer-col h4{margin:0 0 1rem 0;font-size:0.95rem;letter-spacing:0.06em;text-transform:uppercase;color:#fff}
+.footer-blurb{margin:0 0 0.75rem 0;color:#cbd5e1;max-width:44ch}
+.footer-connect .muted{color:#aab3bf}
+.social{display:flex;gap:0.5rem;margin-bottom:1rem}
+.social-link{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:6px;background:rgba(255,255,255,0.03);color:#fff;text-decoration:none;font-weight:700}
+.footer-contact{font-style:normal;color:#cbd5e1;margin:0}
+.footer-contact a{color:#fde68a;text-decoration:none}
+
+/* bottom bar */
+.site-footer-bottom{background:#151617;padding:0.9rem 0;border-top:1px solid rgba(255,255,255,0.03)}
+.footer-bottom-inner{display:flex;align-items:center;justify-content:space-between;font-size:0.9rem;color:#9aa3b3}
+.footer-bottom-inner .bottom-links a{color:#9aa3b3;text-decoration:none;margin-left:1rem}
+
+@media (max-width:900px){
+  .footer-grid{grid-template-columns:1fr;gap:1.25rem}
+  .footer-grid > .footer-col:not(:first-child){border-left:none;padding-left:0}
+  .footer-bottom-inner{flex-direction:column;align-items:flex-start;gap:0.5rem}
+}
 
 @media (max-width:600px){.container{padding:1rem}.hero{padding:2rem 0}}
 
@@ -78,6 +110,50 @@ body{
 @media (max-width:900px){
   .intro-title{font-size:2rem}
   .intro-sub{font-size:0.95rem}
+}
+
+/* Hero hover card that overlaps the bottom of the intro hero */
+.hero-hover-card{
+  /* placed after the hero in the DOM and pulled up to overlap the hero's bottom */
+  position:relative;
+  left:50%;
+  transform:translateX(-50%);
+  margin-top: -110px; /* pull the card up to overlap the bottom of the hero */
+  z-index:12020; /* ensure it sits above the hero overlay/videos and following sections */
+  pointer-events:auto;
+  display:block;
+  width: min(1180px, 94%);
+  max-width:1180px;
+}
+.hero-hover-inner{
+  max-width:1180px;
+  margin:0 auto;
+  background:var(--card);
+  border-radius:14px;
+  box-shadow:0 28px 80px rgba(2,6,23,0.20);
+  overflow:hidden;
+  display:flex;
+  gap:1rem;
+  align-items:stretch;
+  padding:0;
+}
+.hero-hover-card .hover-media{
+  width:40%;
+  min-width:320px;
+  background-size:cover;
+  background-position:center;
+  height:200px;
+}
+.hero-hover-card .hover-body{padding:1.5rem;flex:1}
+.hero-hover-card h3{margin:0 0 0.5rem 0;font-size:1.35rem}
+.hero-hover-card p{margin:0 0 1rem 0;color:var(--muted)}
+.hero-hover-card .cta{background:#f6e05e;color:#111;padding:0.6rem 0.9rem;border-radius:8px;text-decoration:none;display:inline-block}
+
+@media (max-width:900px){
+  /* keep it still overlapping but less offset on small screens */
+  .hero-hover-card{position:relative;left:50%;transform:translateX(-50%);margin-top:-72px;width:calc(100% - 48px);max-width:calc(100% - 48px)}
+  .hero-hover-inner{flex-direction:column}
+  .hero-hover-card .hover-media{width:100%;height:180px;min-width:auto}
 }
 
 /* People / team cards */
@@ -115,13 +191,15 @@ body{
 .modal{position:fixed;inset:0;display:grid;place-items:center;z-index:12000;pointer-events:none;opacity:0;transition:opacity 220ms ease}
 .modal.open{pointer-events:auto;opacity:1}
 .modal-overlay{position:absolute;inset:0;background:rgba(2,6,23,0.6)}
-.modal-dialog{position:relative;z-index:12001;max-width:920px;width:min(92%,960px);margin:1rem}
-.modal-close{position:absolute;right:-0.5rem;top:-0.5rem;background:#fff;border-radius:999px;border:0;width:36px;height:36px;font-size:18px;cursor:pointer;box-shadow:0 6px 20px rgba(2,6,23,0.12)}
+.modal-dialog{position:relative;z-index:12001;max-width:520px;width:min(80%,600px);margin:1rem}
+.modal-close{position:absolute;left:0.5rem;top:0.5rem;transform:none;background:rgba(255,255,255,0.98);border-radius:8px;border:0;width:38px;height:38px;line-height:0;padding:6px;font-size:16px;cursor:pointer;box-shadow:0 8px 26px rgba(2,6,23,0.14);display:flex;align-items:center;justify-content:center;transition:transform 140ms ease,box-shadow 140ms ease;z-index:12003}
+.modal-close:hover{transform:scale(1.06);box-shadow:0 10px 30px rgba(2,6,23,0.18)}
+.modal-close:focus{outline:none;box-shadow:0 0 0 4px rgba(37,99,235,0.14)}
 .modal-content{background:transparent}
 .modal-card{border-radius:12px;overflow:hidden;box-shadow:0 12px 40px rgba(2,6,23,0.08);display:flex;flex-direction:column}
-.modal-card .person-photo{width:100%;aspect-ratio:4/3;overflow:hidden}
-.modal-card .person-photo img{height:100%;width:100%;object-fit:cover;display:block}
-.modal-card .person-body{padding:1.25rem}
+.modal-card .person-photo{width:100%;aspect-ratio:3/2;max-height:360px;overflow:hidden}
+.modal-card .person-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.modal-card .person-body{padding:0.6rem}
 .modal-card .person-body h3{margin:0 0 0.5rem}
 .modal-card .person-notes{margin-top:0.75rem}
 
@@ -188,5 +266,67 @@ body{
   .project-title{font-size:1.75rem}
   .carousel .track img{width:36%}
   .team-grid{gap:0.5rem}
+}
+
+/* Projects listing grid */
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem}
+.project-card{background:var(--card);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 30px rgba(2,6,23,0.06);transition:transform 180ms ease,box-shadow 180ms ease}
+.project-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(2,6,23,0.12)}
+.project-thumb img{width:100%;height:160px;object-fit:cover;display:block}
+.project-card-body{padding:1rem;display:flex;flex-direction:column;gap:0.5rem}
+.project-card-title{margin:0;font-size:1.05rem}
+.project-card-title a{color:inherit;text-decoration:none}
+.project-card-excerpt{color:var(--muted);font-size:0.95rem;margin:0}
+.project-card-meta{margin-top:auto;display:flex;justify-content:flex-end}
+
+@media (max-width:1100px){.projects-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:700px){.projects-grid{grid-template-columns:1fr}.project-thumb img{height:220px}}
+
+/* Full-width hero banner for project detail */
+.project-hero-banner{position:relative;width:100%;overflow:hidden;margin-bottom:1rem;min-height:95vh;background:#000;display:block;background-size:cover;background-repeat:no-repeat;background-position:center right}
+.project-hero-banner::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg, rgba(2,6,23,0.6) 0%, rgba(2,6,23,0.15) 40%, rgba(2,6,23,0) 100%);pointer-events:none;z-index:1}
+.hero-overlay{position:absolute;left:6%;top:50%;transform:translateY(-50%);z-index:2;color:#fff;max-width:54%;display:flex;flex-direction:column;justify-content:center;padding:0 0 0 0}
+.hero-back{display:inline-block;margin-bottom:0.6rem;color:rgba(255,255,255,0.9);text-decoration:none}
+.hero-title{font-size:3rem;margin:0 0 0.35rem 0;line-height:1;color:#fff}
+.hero-sub{color:rgba(255,255,255,0.9);max-width:46ch;margin-bottom:1rem}
+.hero-actions{display:flex;gap:0.75rem}
+.hero-actions .cta{background:#9ae6b4;color:#062;}
+
+.project-detail-main{display:flex;flex-direction:column;gap:2rem;padding:2rem 0;max-width:1000px}
+.project-detail{padding:2rem}
+.project-nav{display:flex;gap:0.75rem}
+.hero-nav{position:absolute;left:50%;bottom:1.25rem;transform:translateX(-50%);display:flex;gap:0.75rem;z-index:3;padding:0.35rem}
+.hero-nav a{padding:0.6rem 1rem;background:rgba(0,0,0,0.45);color:#fff;text-decoration:none;border-radius:10px;font-weight:600;transition:all 180ms ease;border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(6px)}
+.hero-nav a + a{margin-left:0.5rem}
+.hero-nav a:hover{background:rgba(255,255,255,0.12);color:#000}
+
+/* entrance animation for hero-nav */
+.hero-nav{opacity:0;transform:translateX(-50%) translateY(8px);transition:opacity 420ms ease, transform 420ms cubic-bezier(.2,.9,.2,1)}
+.hero-nav.animate-in{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* sticky behaviour when scrolled past hero */
+.hero-nav.is-sticky{position:fixed;left:50%;transform:translateX(-50%);top:var(--hero-nav-top,72px);bottom:auto;z-index:12010;box-shadow:0 14px 40px rgba(2,6,23,0.18);border-radius:10px}
+
+/* active link state (scroll-spy) */
+.hero-nav a.active{background:var(--accent);color:#fff}
+
+@media (max-width:700px){
+  .hero-nav{left:50%;transform:translateX(-50%);overflow-x:auto;padding:0.25rem 0.5rem;gap:0.5rem}
+  .hero-nav a{padding:0.5rem 0.7rem;font-size:0.9rem}
+}
+.project-section{margin-bottom:2.5rem}
+.project-section h2{margin:0 0 1rem 0;font-size:1.4rem;color:#0f172a}
+.project-section .tagline{margin-bottom:1rem}
+.project-team-section{padding:1.5rem}
+.project-team-section h3{margin:0 0 1rem 0}
+
+@media (max-width:900px){
+  .hero-overlay{position:relative;left:0;transform:none;max-width:100%;padding:1rem}
+  .project-hero-banner::after{background:linear-gradient(180deg, rgba(2,6,23,0.5), rgba(2,6,23,0.1))}
+  .hero-title{font-size:1.75rem}
+  .project-detail-main{padding:1rem 0}
+  .project-detail{padding:1rem}
+  .project-nav{flex-wrap:wrap;gap:0.5rem}
+  .project-nav a{padding:0.4rem 0.8rem;font-size:0.9rem}
 }
 

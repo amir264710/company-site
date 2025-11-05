@@ -3,12 +3,9 @@ export const projects = [
     slug: 'project-one',
     title: 'Project VQC',
     description: 'Visual Quality Control system for head cylinder inspection.',
-    heroImage: 'https://images.unsplash.com/photo-1508921912186-1d1a45ebb3c1?q=80&w=1600&auto=format&fit=crop',
+    heroImage: 'public/pictures/VQC/Hero.jpg',
     gallery: [
-      'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1523475496153-3d6ccf9d1d83?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop'
+      'public/pictures/VQC/Hero.jpg'
     ],
     content: `
       <p>This project focuses on the design and development of a Visual Quality Control (VQC) system for inspecting engine head cylinders during manufacturing. The goal of the system is to automate the inspection process, ensuring consistent, high-quality output while reducing human error and inspection time. The head cylinder is a critical engine component that requires precise machining and assembly tolerances; even minor surface defects or dimensional deviations can significantly impact engine performance and reliability. The VQC system aims to detect defects such as surface scratches, dents, porosity, and dimensional inconsistencies using advanced image processing and machine vision techniques.</p>

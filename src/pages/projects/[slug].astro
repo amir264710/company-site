@@ -1,7 +1,6 @@
 ---
 import '../../styles/global.css';
-import Nav from '../../components/Nav.astro';
-import Footer from '../../components/Footer.astro';
+import Base from '../../layouts/Base.astro';
 import { projects } from '../../data/projects.js';
 import { people } from '../../data/people.js';
 
@@ -13,79 +12,101 @@ const project = projects.find((p) => p.slug === Astro.params.slug);
 if (!project) {
   throw new Error(`Project not found: ${Astro.params.slug}`);
 }
+// prefer a local hero for the VQC project if available
+const heroUrl = project.localHero ?? (Astro.params.slug === 'project-one' ? '/pictures/VQC/Hero.jpg' : project.heroImage);
+
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{project.title} — Caraco</title>
-  </head>
-  <body>
-    <Nav />
-    <!-- header with large centered title to match the provided layout -->
-    <header class="project-header">
-      <div class="container">
-        <h1 class="project-title"><span class="accent">{project.title}</span></h1>
+<Base title={`${project.title} — Caraco`}>
+  <!-- Full-width hero banner: large image with overlayed title/CTA -->
+  <section class="project-hero-banner" style={`` + `background-image: url('${heroUrl}');`} aria-hidden="false">
+      <div class="hero-overlay container">
+  <a href="/projects" class="hero-back" aria-label="Back to projects">← Projects</a>
+        <h1 id="project-heading" class="hero-title"><span class="accent">{project.title}</span></h1>
+        <p class="hero-sub">{project.subtitle || project.description}</p>
+        <div class="hero-actions">
+          {project.url ? <a class="cta" href={project.url} target="_blank" rel="noopener">Visit site</a> : null}
+        </div>
+        <!-- quick section navigation will be rendered below the overlay so it can center across the full hero -->
       </div>
-    </header>
+    </section>
+    <!-- hero-centered nav (buttons centered at the bottom of the hero) -->
+    <nav class="hero-nav" aria-label="Project sections">
+      <a href="#overview">Overview</a>
+      <a href="#software">Software</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#challenges">Challenges</a>
+      <a href="#end-result">End Result</a>
+    </nav>
 
-    <!-- full-width layout so media can sit flush to the viewport left (gallery can overflow) -->
-    <main class="project-page">
-      <aside class="project-media card">
-        <img class="project-hero" src={project.heroImage} alt={project.title} />
-        <div class="carousel" aria-hidden="false">
-          <div class="track">
-            {project.gallery && project.gallery.map((g, i) => (
-              <img src={g} alt={`${project.title} screenshot ${i+1}`} key={`a-${i}`} />
-            ))}
-            {project.gallery && project.gallery.map((g, i) => (
-              <img src={g} alt={`${project.title} screenshot ${i+1}`} key={`b-${i}`} />
-            ))}
-          </div>
+
+    <!-- Project details with quick navigation -->
+    <main id="details" class="container project-detail-main">
+      <article class="project-detail card">
+        <!-- Project sections -->
+        <section id="overview" class="project-section">
+          <h2>Overview</h2>
+          <p class="tagline">{project.description}</p>
+          <div class="project-body" set:html={project.overview || project.content}></div>
+        </section>
+
+        <section id="software" class="project-section">
+          <h2>Software</h2>
+          <div class="project-body" set:html={project.software || '<p>Software details coming soon.</p>'}></div>
+        </section>
+
+        <section id="hardware" class="project-section">
+          <h2>Hardware</h2>
+          <div class="project-body" set:html={project.hardware || '<p>Hardware specifications coming soon.</p>'}></div>
+        </section>
+
+        <section id="challenges" class="project-section">
+          <h2>Challenges</h2>
+          <div class="project-body" set:html={project.challenges || '<p>Project challenges and solutions coming soon.</p>'}></div>
+        </section>
+
+        <section id="end-result" class="project-section">
+          <h2>End Result</h2>
+          <div class="project-body" set:html={project.endResult || '<p>Project outcomes and results coming soon.</p>'}></div>
+        </section>
+      </article>
+
+      <!-- People involved section -->
+      <aside class="project-team-section card" aria-labelledby="team-heading">
+        <h3 id="team-heading">People involved</h3>
+        <div class="team-grid">
+          {project.team && project.team.map(member => {
+            const person = member.id ? people.find(p => p.id === member.id) : people.find(p => p.name === member.name);
+            const displayName = person ? person.name : (member.name || member.id || 'Unknown');
+            const dataId = member.id || member.name;
+            return (
+              <div class="team-member team-clickable" data-id={dataId} data-photo={person && person.photo ? person.photo : ''} role="button" tabindex="0">
+                {person && person.photo ? (
+                  <div class="team-avatar"><img loading="lazy" src={person.photo} alt={displayName} /></div>
+                ) : (
+                  <div class="team-avatar">{String(displayName).split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
+                )}
+                <div class="team-meta"><strong>{displayName}</strong><span class="role">{member.role}</span></div>
+              </div>
+            )
+          })}
         </div>
       </aside>
-
-      <div class="project-content-outer">
-        <div class="project-content card container">
-          <div class="project-description">
-            <p class="tagline">{project.description}</p>
-            <div class="project-body" set:html={project.content}></div>
-          </div>
-
-          <div class="project-team">
-            <h3>People involved</h3>
-            <div class="team-grid">
-                {project.team && project.team.map(member => {
-                  const person = member.id ? people.find(p => p.id === member.id) : people.find(p => p.name === member.name);
-                  const displayName = person ? person.name : (member.name || member.id || 'Unknown');
-                  const dataId = member.id || member.name;
-                  return (
-                    <div class="team-member team-clickable" data-id={dataId} data-photo={person && person.photo ? person.photo : ''} role="button" tabindex="0">
-                      {person && person.photo ? (
-                        <div class="team-avatar"><img src={person.photo} alt={displayName} /></div>
-                      ) : (
-                        <div class="team-avatar">{String(displayName).split(' ').map(n=>n[0]).slice(0,2).join('')}</div>
-                      )}
-                      <div class="team-meta"><strong>{displayName}</strong><span class="role">{member.role}</span></div>
-                    </div>
-                  )
-                })}
-              </div>
-          </div>
-        </div>
-      </div>
     </main>
-    <Footer />
     <!-- expose people data (server-rendered) via a data attribute to avoid template->JS injection issues -->
     <div id="people-data" data-people={JSON.stringify(people)} style="display:none"></div>
     <div id="person-modal" class="modal" aria-hidden="true">
       <div class="modal-overlay" data-modal-close></div>
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <button class="modal-close" aria-label="Close" data-modal-close>×</button>
+        <button class="modal-close" aria-label="Close" data-modal-close>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M18 6L6 18" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M6 6L18 18" stroke="#0f172a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
         <div class="modal-content"></div>
       </div>
+    </div>
     <script type="module">
       // thumbnail -> hero switcher
       const initHeroSwitcher = () => {
@@ -186,6 +207,89 @@ if (!project) {
         document.addEventListener('DOMContentLoaded', initPersonModal);
       } else {
         initPersonModal();
+      }
+
+      // hero nav: entrance animation, sticky-on-scroll, and scroll-spy
+      const initHeroNav = () => {
+        const hero = document.querySelector('.project-hero-banner');
+        const nav = document.querySelector('.hero-nav');
+        if (!nav) return;
+
+        // entrance animation
+        requestAnimationFrame(() => nav.classList.add('animate-in'));
+
+        const siteNav = document.querySelector('.site-nav');
+        const topOffset = () => (siteNav ? siteNav.getBoundingClientRect().height + 8 : 8);
+
+        // placeholder to avoid layout jump when nav becomes fixed
+        let placeholder = null;
+
+        const setSticky = (isSticky) => {
+          if (isSticky) {
+            if (!nav.classList.contains('is-sticky')) {
+              nav.classList.add('is-sticky');
+              nav.style.setProperty('--hero-nav-top', `${topOffset()}px`);
+              placeholder = document.createElement('div');
+              placeholder.style.width = '100%';
+              placeholder.style.height = `${nav.offsetHeight}px`;
+              nav.parentNode.insertBefore(placeholder, nav.nextSibling);
+            }
+          } else {
+            if (nav.classList.contains('is-sticky')) {
+              nav.classList.remove('is-sticky');
+              if (placeholder) { placeholder.remove(); placeholder = null; }
+            }
+          }
+        };
+
+        const heroBottom = () => hero ? hero.getBoundingClientRect().bottom + window.scrollY : 0;
+
+        let ticking = false;
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            const y = window.scrollY;
+            setSticky(y + topOffset() >= heroBottom());
+            ticking = false;
+          });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', () => { if (nav.classList.contains('is-sticky')) nav.style.setProperty('--hero-nav-top', `${topOffset()}px`); });
+
+        // scroll spy using IntersectionObserver
+        const links = Array.from(nav.querySelectorAll('a'));
+        const sections = links.map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+        if (sections.length) {
+          const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                const id = e.target.id;
+                links.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${id}`));
+              }
+            });
+          }, { root: null, rootMargin: '0px 0px -50% 0px', threshold: 0.01 });
+          sections.forEach(s => io.observe(s));
+        }
+
+        // smooth scrolling for nav links
+        nav.querySelectorAll('a').forEach(a => {
+          a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const t = document.querySelector(a.getAttribute('href'));
+            if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        });
+
+        // initial check
+        onScroll();
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeroNav);
+      } else {
+        initHeroNav();
       }
     </script>
   </body>

@@ -13,9 +13,21 @@
       </div>
     </div>
 
-    <button class="intro-skip" aria-label="Enter site">Enter site</button>
+    <!-- floating hover card at bottom of hero (moved outside the hero to avoid clipping) -->
   </div>
 </section>
+
+<!-- hero hover card placed after the hero so it can overlap the bottom of the hero without being clipped -->
+<div class="hero-hover-card" role="region" aria-label="Find your local team">
+  <div class="hero-hover-inner container">
+    <div class="hover-media" style={`background-image:url('/pictures/General/hover-box.jpg')`}></div>
+    <div class="hover-body">
+      <h3>EOAT Tooling and Service Across the Globe</h3>
+      <p>Globally positioned, our worldwide network of subsidiaries supports customers through planning, design, assembly and launch of EOAT tooling.</p>
+      <a class="cta" href="/contact">Find your local team</a>
+    </div>
+  </div>
+</div>
 
 <script type="module">
   // Crossfade background videos: cycle opacity between stacked videos
@@ -34,10 +46,5 @@
   // change every 6s
   const timer = setInterval(cycle, 6000);
 
-  // Skip/enter button scrolls to main content
-  const btn = document.querySelector('.intro-skip');
-  btn?.addEventListener('click', () => {
-    clearInterval(timer);
-    document.querySelector('main')?.scrollIntoView({ behavior: 'smooth' });
-  });
+  // Skip/enter button removed; keep video cycling
 </script>
